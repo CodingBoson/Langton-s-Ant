@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Langton's Ant 🐜✨</title>
+        <style>
+            body {
+                margin: 0;
+                background: #111;
+                color: #fff;
+                font-family: "Segoe UI", sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            canvas {
+                border: 3px solid hotpink;
+                margin-top: 10px;
+            }
+
+            #controls {
+                margin-top: 1rem;
+            }
+
+            button,
+            input {
+                background: #222;
+                color: #fff;
+                border: 1px solid #555;
+                padding: 0.5rem;
+                margin: 0.2rem;
+                border-radius: 6px;
+                font-size: 1rem;
+            }
+
+            button:hover,
+            input:hover {
+                background: #333;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>Langton's Ant 🐜</h1>
+        <div id="controls">
+            <label
+                >Speed:
+                <input type="range" id="speed" min="1" max="1000" value="100"
+            /></label>
+            <button onclick="addAnt()">Add Ant 🐜</button>
+            <button onclick="toggleGrid()">Toggle Grid 🧮</button>
+        </div>
+        <canvas id="antCanvas" width="600" height="600"></canvas>
+
+        <script>
+            const canvas = document.getElementById("antCanvas");
+            const ctx = canvas.getContext("2d");
+
+            const cellSize = 5;
+            const cols = canvas.width / cellSize;
+            const rows = canvas.height / cellSize;
+            const grid = Array.from({ length: rows }, () =>
+                Array(cols).fill(0)
+            );
+
+            const ants = [createAnt()];
+            let showGrid = false;
+            let playMoans = false;
+            let hue = 0;
+
+            function createAnt() {
+                return {
+                    x: Math.floor(cols / 2),
+                    y: Math.floor(rows / 2),
+                    dir: Math.floor(Math.random() * 4),
+                    colorHue: Math.floor(Math.random() * 360),
+                };
+            }
+
+            function drawCell(x, y, color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+            }
+
+            function stepAnt(ant) {
+                const { x, y } = ant;
+                const color = grid[y][x];
+
+                grid[y][x] = 1 - color;
+
+                const cellColor = `hsl(${hue++ % 360}, 100%, ${
+                    color ? "95%" : "10%"
+                })`;
+                drawCell(x, y, cellColor);
+
+                if (color === 0) ant.dir = (ant.dir + 1) % 4;
+                else ant.dir = (ant.dir + 3) % 4;
+
+                if (ant.dir === 0) ant.y--;
+                if (ant.dir === 1) ant.x++;
+                if (ant.dir === 2) ant.y++;
+                if (ant.dir === 3) ant.x--;
+
+                ant.x = (ant.x + cols) % cols;
+                ant.y = (ant.y + rows) % rows;
+            }
+
+            function drawGridLines() {
+                ctx.strokeStyle = "rgba(255,255,255,0.05)";
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i <= cols; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * cellSize, 0);
+                    ctx.lineTo(i * cellSize, canvas.height);
+                    ctx.stroke();
+                }
+                for (let j = 0; j <= rows; j++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, j * cellSize);
+                    ctx.lineTo(canvas.width, j * cellSize);
+                    ctx.stroke();
+                }
+            }
+
+            function animate() {
+                let speed = parseInt(document.getElementById("speed").value);
+                for (let i = 0; i < speed; i++) {
+                    ants.forEach(stepAnt);
+                }
+                if (showGrid) drawGridLines();
+                requestAnimationFrame(animate);
+            }
+
+            function addAnt() {
+                ants.push(createAnt());
+            }
+
+            function toggleGrid() {
+                showGrid = !showGrid;
+            }
+
+            animate();
+        </script>
+    </body>
+</html>
