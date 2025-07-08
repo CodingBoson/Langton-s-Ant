@@ -11,7 +11,7 @@ A simple interactive simulation of [Langton's Ant](https://en.wikipedia.org/wiki
 
 ## Usage
 
-1. Open `src/index.html` in your browser.
+1. Open `src/index.html` in your browser or visit [Langton's Ant](https://langton-s-ant.pages.dev/).
 2. Use the controls to:
     - Adjust speed with the slider
     - Add more ants with the "Add Ant" button
